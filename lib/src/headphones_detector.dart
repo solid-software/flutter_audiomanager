@@ -43,9 +43,6 @@ class HeadphonesDetector {
           _wiredConnectionChannel.receiveBroadcastStream().map((dynamic event) {
         return HeadphonesConnectionState.values[event as int];
       }).listen(_wiredConnectedController.add);
-
-      headphonesState(headphonesType: HeadphonesType.wired)
-          .then(_wiredConnectedController.add);
     }
 
     return _wiredConnectedController.stream;
