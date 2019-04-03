@@ -13,12 +13,12 @@ import io.flutter.plugin.common.EventChannel.StreamHandler;
 
 import static io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class HeadphonesConnectionReceiver implements StreamHandler {
+public class HeadphonesWiredConnectionReceiver implements StreamHandler {
     private final Registrar registrar;
     private BroadcastReceiver receiver;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    HeadphonesConnectionReceiver(Registrar registrar) {
+    HeadphonesWiredConnectionReceiver(Registrar registrar) {
         this.registrar = registrar;
     }
 

@@ -5,12 +5,14 @@ import 'package:flutter_audiomanager/src/headphones_connection_state.dart';
 import 'package:flutter_audiomanager/src/headphones_type.dart';
 
 abstract class _HeadphonesChannel {
-  static const String detectConnected = 'com.example.flutter_headphones/finder';
+  static const String detectConnected =
+      'com.example.flutter_headphones/detect_state';
 
-  static const String onPlugged = 'com.example.flutter_headphones/receiver';
+  static const String onPlugged =
+      'com.example.flutter_headphones/wired_state_events';
 
   static const String onBluetoothHeadsetConnected =
-      'com.example.flutter_headphones/bluetooth_receiver';
+      'com.example.flutter_headphones/bluetooth_state_events';
 }
 
 class HeadphonesDetector {
@@ -21,12 +23,6 @@ class HeadphonesDetector {
   final EventChannel _bluetoothConnectionChannel =
       EventChannel(_HeadphonesChannel.onBluetoothHeadsetConnected);
 
-  StreamController<HeadphonesConnectionState> _bluetoothConnectedController;
-  StreamController<HeadphonesConnectionState> _wiredConnectedController;
-
-  StreamSubscription<HeadphonesConnectionState> _wiredListener;
-  StreamSubscription<HeadphonesConnectionState> _bluetoothListener;
-
   Future<HeadphonesConnectionState> headphonesState({
     HeadphonesType headphonesType = HeadphonesType.any,
   }) async {
@@ -36,39 +32,18 @@ class HeadphonesDetector {
   }
 
   Stream<HeadphonesConnectionState> get wiredHeadphonesConnectionState {
-    if (_wiredConnectedController == null) {
-      _wiredConnectedController = StreamController.broadcast();
-
-      _wiredListener =
-          _wiredConnectionChannel.receiveBroadcastStream().map((dynamic event) {
-        return HeadphonesConnectionState.values[event as int];
-      }).listen(_wiredConnectedController.add);
-    }
-
-    return _wiredConnectedController.stream;
+    return _wiredConnectionChannel
+        .receiveBroadcastStream()
+        .map((dynamic event) {
+      return HeadphonesConnectionState.values[event as int];
+    });
   }
 
   Stream<HeadphonesConnectionState> get bluetoothHeadphonesConnectionState {
-    if (_bluetoothConnectedController == null) {
-      _bluetoothConnectedController = StreamController.broadcast();
-
-      _bluetoothListener = _bluetoothConnectionChannel
-          .receiveBroadcastStream()
-          .map((dynamic event) {
-        return HeadphonesConnectionState.values[event as int];
-      }).listen(_bluetoothConnectedController.add);
-
-      headphonesState(headphonesType: HeadphonesType.bluetooth)
-          .then(_bluetoothConnectedController.add);
-    }
-
-    return _bluetoothConnectedController.stream;
-  }
-
-  void close() {
-    _wiredConnectedController?.close();
-    _bluetoothConnectedController?.close();
-    _wiredListener?.cancel();
-    _bluetoothListener?.cancel();
+    return _bluetoothConnectionChannel
+        .receiveBroadcastStream()
+        .map((dynamic event) {
+      return HeadphonesConnectionState.values[event as int];
+    });
   }
 }

@@ -8,26 +8,29 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  * FlutterAudiomanagerPlugin
  */
 public class FlutterAudiomanagerPlugin {
-    private static final String HEADPHONES_FINDER = "com.example.flutter_headphones/finder";
-    private static final String HEADPHONES_RECEIVER = "com.example.flutter_headphones/receiver";
-    private static final String BLUETOOTH_RECEIVER = "com.example.flutter_headphones/bluetooth_receiver";
+    private static final String DETECT_STATE = "com.example.flutter_headphones/detect_state";
+    private static final String WIRED_STATE_EVENTS = "com.example.flutter_headphones/wired_state_events";
+    private static final String BLUETOOTH_STATE_EVENTS = "com.example.flutter_headphones/bluetooth_state_events";
 
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
-        final HeadphonesDetector finder = new HeadphonesDetector(registrar);
-        final MethodChannel finderChannel = new MethodChannel(registrar.messenger(),
-                HEADPHONES_FINDER);
-        finderChannel.setMethodCallHandler(finder);
+        final HeadphonesDetector detector = new HeadphonesDetector(registrar);
+        final MethodChannel detectorChannel = new MethodChannel(registrar.messenger(),
+                DETECT_STATE);
+        detectorChannel.setMethodCallHandler(detector);
 
-        final HeadphonesConnectionReceiver receiver = new HeadphonesConnectionReceiver(registrar);
+        final HeadphonesWiredConnectionReceiver wiredConnectionReceiver =
+                new HeadphonesWiredConnectionReceiver(registrar);
         final EventChannel receiveHeadphonesChannel = new EventChannel(registrar.messenger(),
-                HEADPHONES_RECEIVER);
-        receiveHeadphonesChannel.setStreamHandler(receiver);
+                WIRED_STATE_EVENTS);
+        receiveHeadphonesChannel.setStreamHandler(wiredConnectionReceiver);
 
-        final HeadphonesBluetoothConnectionReceiver bluetoothReceiver = new HeadphonesBluetoothConnectionReceiver(registrar);
-        final EventChannel receiveBluetoothChannel = new EventChannel(registrar.messenger(), BLUETOOTH_RECEIVER);
-        receiveBluetoothChannel.setStreamHandler(bluetoothReceiver);
+        final HeadphonesBluetoothConnectionReceiver bluetoothConnectionReceiver =
+                new HeadphonesBluetoothConnectionReceiver(registrar);
+        final EventChannel receiveBluetoothChannel = new EventChannel(registrar.messenger(),
+                BLUETOOTH_STATE_EVENTS);
+        receiveBluetoothChannel.setStreamHandler(bluetoothConnectionReceiver);
     }
 }

@@ -32,7 +32,7 @@ public class HeadphonesDetector implements MethodCallHandler {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private HeadphonesConnectionState isWiredHeadphonesPlugged() {
+    private HeadphonesConnectionState wiredHeadphonesConnectionState() {
         AudioManager audioManager =
                 (AudioManager) registrar.context().getSystemService(Context.AUDIO_SERVICE);
 
@@ -50,7 +50,7 @@ public class HeadphonesDetector implements MethodCallHandler {
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    private HeadphonesConnectionState isBluetoothHeadphonesPlugged() {
+    HeadphonesConnectionState bluetoothHeadphonesConnectionState() {
         BluetoothManager bluetoothManager =
                 (BluetoothManager) registrar.context().getSystemService(Context.BLUETOOTH_SERVICE);
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
@@ -84,14 +84,14 @@ public class HeadphonesDetector implements MethodCallHandler {
             if (type != null) {
                 switch (type) {
                     case WIRED_HEADPHONES:
-                        result.success(isWiredHeadphonesPlugged().ordinal());
+                        result.success(wiredHeadphonesConnectionState().ordinal());
                         break;
                     case BLUETOOTH_HEADPHONES:
-                        result.success(isBluetoothHeadphonesPlugged().ordinal());
+                        result.success(bluetoothHeadphonesConnectionState().ordinal());
                         break;
                     case ANY:
-                        if (isWiredHeadphonesPlugged() == HeadphonesConnectionState.CONNECTED
-                                || isBluetoothHeadphonesPlugged() == HeadphonesConnectionState.CONNECTED) {
+                        if (wiredHeadphonesConnectionState() == HeadphonesConnectionState.CONNECTED
+                                || bluetoothHeadphonesConnectionState() == HeadphonesConnectionState.CONNECTED) {
                             result.success(HeadphonesConnectionState.CONNECTED.ordinal());
                         } else {
                             result.success(HeadphonesConnectionState.DISCONNECTED.ordinal());

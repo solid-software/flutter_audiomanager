@@ -18,16 +18,19 @@ import static io.flutter.plugin.common.PluginRegistry.Registrar;
 public class HeadphonesBluetoothConnectionReceiver implements StreamHandler {
     private final Registrar registrar;
     private BroadcastReceiver receiver;
+    private HeadphonesDetector detector;
 
     HeadphonesBluetoothConnectionReceiver(Registrar registrar) {
         this.registrar = registrar;
+        detector = new HeadphonesDetector(registrar);
     }
 
     @Override
-    public void onListen(Object arguments, EventSink events) {
-        receiver = createBluetoothReceiver(events);
+    public void onListen(Object arguments, EventSink eventSink) {
+        receiver = createBluetoothReceiver(eventSink);
         registrar.context().registerReceiver(receiver,
                 new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED));
+        eventSink.success(detector.bluetoothHeadphonesConnectionState().ordinal());
     }
 
     @Override
@@ -36,7 +39,7 @@ public class HeadphonesBluetoothConnectionReceiver implements StreamHandler {
         receiver = null;
     }
 
-    private BroadcastReceiver createBluetoothReceiver(final EventSink events) {
+    private BroadcastReceiver createBluetoothReceiver(final EventSink eventSink) {
         return new BroadcastReceiver() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
             @Override
@@ -64,7 +67,7 @@ public class HeadphonesBluetoothConnectionReceiver implements StreamHandler {
                             break;
                     }
                 }
-                events.success(event.ordinal());
+                eventSink.success(event.ordinal());
             }
         };
     }
