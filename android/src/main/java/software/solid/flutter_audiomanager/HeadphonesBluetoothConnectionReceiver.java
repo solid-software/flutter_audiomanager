@@ -2,8 +2,6 @@ package software.solid.flutter_audiomanager;
 
 import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -46,25 +44,24 @@ public class HeadphonesBluetoothConnectionReceiver implements StreamHandler {
             public void onReceive(Context context, Intent intent) {
                 final String action = intent.getAction();
                 HeadphonesConnectionState event = HeadphonesConnectionState.DISCONNECTED;
-                if (action != null && action.equals(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)) {
-                    BluetoothManager bluetoothManager =
-                            (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-                    BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-
-                    final int state = bluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEADSET);
+                if (intent.hasExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE)) {
+                    final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE,
+                            HeadphonesConnectionState.DISCONNECTED.ordinal());
                     switch (state) {
-                        case BluetoothAdapter.STATE_DISCONNECTED:
-                            event = HeadphonesConnectionState.DISCONNECTED;
-                            break;
-                        case BluetoothAdapter.STATE_DISCONNECTING:
-                            event = HeadphonesConnectionState.DISCONNECTING;
-                            break;
                         case BluetoothAdapter.STATE_CONNECTED:
                             event = HeadphonesConnectionState.CONNECTED;
                             break;
                         case BluetoothAdapter.STATE_CONNECTING:
                             event = HeadphonesConnectionState.CONNECTING;
                             break;
+                        case BluetoothAdapter.STATE_DISCONNECTED:
+                            event = HeadphonesConnectionState.DISCONNECTED;
+                            break;
+                        case BluetoothAdapter.STATE_DISCONNECTING:
+                            event = HeadphonesConnectionState.DISCONNECTING;
+                            break;
+                        default:
+                            event = HeadphonesConnectionState.DISCONNECTED;
                     }
                 }
                 eventSink.success(event.ordinal());
